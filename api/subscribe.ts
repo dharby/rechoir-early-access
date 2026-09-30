@@ -117,6 +117,30 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
 
     console.error("EmailOctopus error", upstream.status, detail?.title, detail?.detail);
+
+    // EmailOctopus answers 404 "Resource not found" for a bad key AND a bad
+    // list id, so the log line above cannot tell them apart. Probe the key on
+    // its own to produce a self-diagnosing message in the function logs.
+    try {
+      const probe = await fetch(`${EMAILOCTOPUS_API}/account-details`, {
+        headers: { Authorization: `Basic ${Buffer.from(`${apiKey}:`).toString("base64")}` },
+      });
+      if (probe.ok) {
+        console.error(
+          "Newsletter diagnosis: the API key is VALID, so EMAILOCTOPUS_LIST_ID is the problem. " +
+            "Copy the list id from EmailOctopus -> Lists (it is a UUID, not the list name).",
+        );
+      } else {
+        console.error(
+          `Newsletter diagnosis: the API key itself was rejected by EmailOctopus (HTTP ${probe.status}). ` +
+            "Set a current key from Account -> API keys. If you rotated the key after " +
+            "setting it in Vercel, update EMAILOCTOPUS_API_KEY and redeploy.",
+        );
+      }
+    } catch (probeErr) {
+      console.error("Newsletter diagnosis probe failed", probeErr);
+    }
+
     send(res, 502, { ok: false, error: "We could not subscribe you just now. Please try again." });
   } catch (err) {
     console.error("Newsletter request failed", err);
