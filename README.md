@@ -35,6 +35,8 @@ src/
     site-config.ts   Contact email, trial length, launch price, form gate
     utils.ts         cn() class-name helper
   index.css   Design tokens + component classes
+api/
+  subscribe.ts  EmailOctopus newsletter endpoint (server-side, holds the key)
 ```
 
 ## Content and configuration
@@ -50,12 +52,50 @@ Three files drive everything you are likely to want to change:
 
 ## The application form
 
-The form has **no backend and no database**. Submitting composes a `mailto:`
-draft to `CONTACT_EMAIL` with the answers filled in, and opens the visitor's
-own email app so they can review and send it themselves. Nothing is stored.
+The Early Access form has **no backend and no database**. Submitting composes a
+`mailto:` draft to `CONTACT_EMAIL` with the answers filled in, and opens the
+visitor's own email app so they can review and send it themselves. Nothing is
+stored.
 
 To switch to a real endpoint, replace the submit handler in
 `src/components/site/ApplySection.tsx`.
+
+## Newsletter (EmailOctopus)
+
+The newsletter **is** a real subscription — it posts to a serverless function
+at `api/subscribe.ts`, which adds the subscriber to your EmailOctopus list.
+
+**Why a function and not a direct call:** the EmailOctopus API key is an
+account-wide credential that can read and modify every list. This repository is
+public, so a key placed in the client bundle would be readable by anyone. The
+browser posts the address to `/api/subscribe`, and the function attaches the
+secret on the server. The key lives only in the deployment environment.
+
+### Setup
+
+1. In EmailOctopus, copy your API key (Account → API keys) and the list id of
+   the audience you want to add to.
+2. Set both as environment variables — in the Vercel dashboard for a live
+   deployment, or in `.env.local` (gitignored) for local testing. See
+   `.env.example` for the names.
+
+```
+EMAILOCTOPUS_API_KEY=
+EMAILOCTOPUS_LIST_ID=
+```
+
+Without them the endpoint returns a clear "not configured yet" error and the
+form shows that, rather than pretending to subscribe someone.
+
+### Notes
+
+- Subscribers are added with `status: "pending"`, so EmailOctopus sends a
+  **double opt-in** confirmation email. The success copy reflects this — it asks
+  the visitor to check their inbox rather than claiming they are already on the
+  list.
+- A hidden honeypot field filters naive bots, and the endpoint rejects
+  non-POST requests, malformed bodies, oversized payloads and invalid addresses.
+- Re-subscribing an existing address is treated as success, not an error.
 
 ## Data shown on this site
 

@@ -5,6 +5,7 @@ import { FeaturesSection } from "@/components/site/FeaturesSection";
 import { HowItWorksSection } from "@/components/site/HowItWorksSection";
 import { FaqSection } from "@/components/site/FaqSection";
 import { ApplySection } from "@/components/site/ApplySection";
+import { NewsletterSection } from "@/components/site/NewsletterSection";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Footer } from "@/components/site/Footer";
 
@@ -27,6 +28,7 @@ export default function App() {
         <HowItWorksSection />
         <FaqSection />
         <ApplySection />
+        <NewsletterSection />
         <FinalCta />
       </main>
 
