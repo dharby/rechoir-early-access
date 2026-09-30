@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * ReChoir Early Access — design tokens.
+ * Values are lifted from the real ReChoir app's "landing page marketing theme"
+ * (src/index.css) so this site matches the ReChoir public brand layer:
+ * dark navy surfaces, warm off-white text, teal accent.
+ */
+@layer base {
+  :root {
+    /* Surfaces */
+    --landing-bg: 222 40% 5%;
+    --landing-fg: 45 30% 96%;
+    --landing-surface: 222 40% 7%;
+    --landing-border: 222 20% 15%;
+    /* Brand muted hue/sat, lifted to 55% lightness: the app's 50% value lands at
+       4.49:1 on this background, which fails WCAG AA for body text. 55% keeps
+       the same tone and measures 5.43:1. */
+    --landing-muted: 220 15% 55%;
+
+    /* Accent */
+    --landing-accent: 162 75% 48%;
+    --landing-accent-fg: 222 40% 5%;
+
+    --radius: 0.75rem;
+  }
+
+  * {
+    border-color: hsl(var(--landing-border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor targets so the sticky header doesn't cover section titles. */
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: hsl(var(--landing-bg));
+    color: hsl(var(--landing-fg));
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevents horizontal scroll from any decorative overflow on narrow phones. */
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Geist", "Inter", system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Visible, consistent focus ring for keyboard users across the whole site. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--landing-accent));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-[hsl(var(--landing-border))] bg-[hsl(var(--landing-surface))] px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-[hsl(var(--landing-accent))];
+  }
+
+  .section-heading {
+    @apply text-3xl font-bold leading-tight sm:text-4xl;
+  }
+
+  .section-sub {
+    @apply mt-4 text-base leading-relaxed text-[hsl(var(--landing-muted))] sm:text-lg;
+  }
+
+  /* Buttons — min 44px tall so they stay comfortable tap targets on mobile. */
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold
+           transition-[background-color,border-color,color,box-shadow,transform] duration-150
+           active:scale-[0.98];
+  }
+
+  .btn-primary {
+    @apply btn bg-[hsl(var(--landing-accent))] text-[hsl(var(--landing-accent-fg))]
+           hover:brightness-110 hover:shadow-[0_8px_24px_-8px_hsl(var(--landing-accent)/0.6)];
+  }
+
+  .btn-secondary {
+    @apply btn border border-[hsl(var(--landing-border))] bg-[hsl(var(--landing-surface))]
+           text-[hsl(var(--landing-fg))] hover:border-[hsl(var(--landing-accent)/0.5)] hover:bg-[hsl(var(--landing-surface)/0.6)];
+  }
+
+  .card {
+    @apply rounded-2xl border border-[hsl(var(--landing-border))] bg-[hsl(var(--landing-surface))];
+  }
+
+  .card-interactive {
+    @apply card transition-[transform,border-color,box-shadow] duration-200
+           hover:-translate-y-1 hover:border-[hsl(var(--landing-accent)/0.4)]
+           hover:shadow-[0_20px_40px_-20px_hsl(var(--landing-accent)/0.35)];
+  }
+
+  /* Form primitives — min 44px tall, matching the button tap target. */
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-[hsl(var(--landing-fg)/0.85)];
+  }
+
+  .input {
+    @apply block min-h-[44px] w-full rounded-xl border border-[hsl(var(--landing-border))]
+           bg-[hsl(var(--landing-bg)/0.6)] px-3.5 py-2.5 text-sm text-[hsl(var(--landing-fg))]
+           placeholder:text-[hsl(var(--landing-muted))]/70
+           transition-[border-color,box-shadow] duration-150
+           hover:border-[hsl(var(--landing-border))]/80
+           focus:border-[hsl(var(--landing-accent))] focus:outline-none
+           focus:ring-2 focus:ring-[hsl(var(--landing-accent)/0.35)];
+  }
+
+  /* Native select needs an explicit background so it doesn't flash white. */
+  select.input {
+    @apply cursor-pointer appearance-none bg-[length:16px] bg-[right_0.9rem_center] bg-no-repeat pr-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+
+  .input-error {
+    @apply border-rose-500/70 focus:border-rose-500 focus:ring-rose-500/30;
+  }
+
+  .field-error {
+    @apply mt-1.5 text-sm text-rose-300;
+  }
+}
+
+@layer utilities {
+  /* Gradient wash used behind the hero and CTA bands. */
+  .bg-glow {
+    background-image:
+      radial-gradient(60rem 32rem at 50% -12%, hsl(var(--landing-accent) / 0.13), transparent 65%),
+      radial-gradient(40rem 26rem at 88% 8%, hsl(215 60% 45% / 0.1), transparent 60%);
+  }
+
+  .grid-lines {
+    background-image:
+      linear-gradient(hsl(var(--landing-border) / 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--landing-border) / 0.5) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(70% 60% at 50% 0%, #000 30%, transparent 75%);
+  }
+
+  /* Scroll reveal — opacity/transform only, and disabled under reduced motion. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    .reveal,
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
